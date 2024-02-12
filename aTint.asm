@@ -5,7 +5,7 @@ section .data
     ; strNumber db '+1R3', 0 ; Another example of an invalid string
 
 section .bss
-    intResult resd 1 ; Reserve space for the result integer
+    intResult resd 1  ; Reserve space for the result integer
     isNegative resb 1 ; Reserve a byte to store sign information
 
 section .text

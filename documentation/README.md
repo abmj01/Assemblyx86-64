@@ -37,6 +37,9 @@ section .bss
 
 First of all we declare a 32-bit variable `intNum`. Then we reserve 12 bytes of data for `strNum` buffer.
 
+---------------------------------------------------------------------------------------------
+
+##### Checking the integer if and initializing variables
 ```asm
 _start:
 ; Check for sign and prepare for conversion
@@ -56,12 +59,14 @@ for `idiv` the signed integer division operation using the `cdq` instruction.
 
 Consequently, we set the divisor 10 to start to the `ebx` register.
 
-After that, we check if the `eax` register is equal to 0 using the `cmp` compare command. If correct we jump using the `jum` 
+After that, we check if the `eax` register is equal to 0 using the `cmp` compare command. If correct we jump using the `jge` 
 command to the `divideLoop` function which will be explained in the following section.
-If not, we continue to the next line `neg eax` this line negates what's inside the eax register.
+If not, we continue to the next line `neg eax` this line negates what's inside the eax register in the 2's complement so if the number is 7 the command will change it to -7.
 Proceeding, we store a '-' sign to the strNum buffer and jump to the `didvideLoop` function.
 
+------------------------------------------------------------------------------------------------
 
+##### Dividing the integers and pushing the remainder to the stack
 ```asm
 divideLoop:
     mov edx, 0             ; Clear edx for idiv operation
@@ -93,8 +98,11 @@ Next, we take the address of `strNum` to the `rbx` register. We add 1 byte to `r
 popping each character to `strNum`.
 
 
-After that, we set `rdi` register to 0 to use it as an index to the following `popLoop` function
+After that, we set `rdi` register to 0 to use it as an index to the following `popLoop` function.
 
+-------------------------------------------------------------------------------------------------
+
+##### Popping the integers and initializing the integer string variable
 ```asm
  popLoop:
     pop rax                ; Pop intDigit

@@ -1,50 +1,50 @@
 section .data
-NULL equ 0
-EXIT_SUCCESS equ 0
-SYS_exit equ 60
+   NULL equ 0
+   EXIT_SUCCESS equ 0
+   SYS_exit equ 60
 
-strNum1 db "", 0
-strNum2 db "", 0
-AskUser db "Integer calculator. Choose Operand within (+,-,*,/): ", 10,0
-firstOp db "Enter first operand: ", 10,0
-SecondOp db "Enter second operand: ", 10,0
-resultStr db "The result is: ", 10,0
+   strNum1 db "", 0
+   strNum2 db "", 0
+   AskUser db "Integer calculator. Choose Operand within (+,-,*,/): ", 10,0
+   firstOp db "Enter first operand: ", 10,0
+   SecondOp db "Enter second operand: ", 10,0
+   resultStr db "The result is: ", 10,0
 
 
 section .bss
 
-intNum1 resd 1
-intNum2 resd 1
-isNegative resb 1
-operand resb 1
+   intNum1 resd 1
+   intNum2 resd 1
+   isNegative resb 1
+   operand resb 1
 
 
 
 
 section .text
-global _start
-
-_start:
+   global _start
+   
+   _start:
 
 
 
 
 
 _input1:
-mov rax, 0 
-mov rdi, 0
-mov rsi, intNum1
-mov rdx, 10
-syscall
-ret
+   mov rax, 0 
+   mov rdi, 0
+   mov rsi, intNum1
+   mov rdx, 10
+   syscall
+   ret
 
 _input2:
-mov rax, 0 
-mov rdi, 0
-mov rsi, intNum2
-mov rdx, 10
-syscall
-ret
+   mov rax, 0 
+   mov rdi, 0
+   mov rsi, intNum2
+   mov rdx, 10
+   syscall
+   ret
 
 
 
