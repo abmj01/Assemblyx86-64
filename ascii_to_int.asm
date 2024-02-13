@@ -1,19 +1,16 @@
-;ASCII to integer
 section .data
-    strNumber db '-41275', 0 ; Example of a valid string
-    ; strNumber db '1+32', 0 ; Example of an invalid string
-    ; strNumber db '+1R3', 0 ; Another example of an invalid string
+    strNumber dd '-99765', 0 ; Example of a valid string
+    isNegative db 0
 
 section .bss
-    intResult resd 1  ; Reserve space for the result integer
-    isNegative resb 1 ; Reserve a byte to store sign information
+    intResult resq 1  ; Reserve space for the result integer
 
 section .text
     global _start
 
 _start:
     mov rsi, strNumber      ; Address of the string to rsi
-    mov rdi, 0              ; Clear rdi for the result
+    mov r8, 0              ; Clear r8 for the result
     xor eax, eax            ; Clear eax for general use
     mov al, [rsi]           ; Load the first character of the string
 
@@ -29,22 +26,22 @@ _start:
 
 checkNextChar:
     inc rsi                  ; Move to the next character for validation
- 
-validateLoop: 
+
+validateLoop:
     mov al, [rsi]            ; Load the next character
     test al, al              ; Check if NULL
     jz startConversion       ; If NULL, end of string and valid
-    cmp al, '0' 
+    cmp al, '0'
     jl invalidInput          ; Less than '0' is invalid
-    cmp al, '9' 
+    cmp al, '9'
     jg invalidInput          ; Greater than '9' is invalid
     inc rsi                  ; Move to the next character
-    jmp validateLoop 
- 
-startConversion: 
+    jmp validateLoop
+
+startConversion:
     mov rsi, strNumber       ; Reset RSI to start of the string for conversion
     mov al, [rsi]            ; Re-check for a sign
-    cmp al, '-' 
+    cmp al, '-'
     je negativeNumber
     cmp al, '+'
     je positiveNumber
@@ -66,18 +63,23 @@ convertLoop:
     test al, al
     jz conversionDone
     sub al, '0'
-    imul rdi, rdi, 10
-    add rdi, rax
+    imul r8, r8, 10
+    add r8, rax
     jmp convertLoop
 
 conversionDone:
-    mov [intResult], rdi       ; Store the result
-    jmp exitProgram
+    mov [intResult], r8       ; Store the result
+    cmp byte [isNegative], 1
+    jne exitProgram
+             ; Jump if not negative
+    neg dword [intResult]      ; Negate the result if negative
+
+exitProgram:
+    ; Cleanly exit the program
+    mov rax, 60
+    mov rdi, 0
+    syscall
 
 invalidInput:
     mov dword [intResult], 0xFFFFFFFF ; Indicate invalid input
-    ; Exit program
-exitProgram:
-    mov rax, 60 
-    mov rdi, 0 
-    syscall
+    jmp exitProgram

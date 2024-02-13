@@ -3,17 +3,17 @@ section .data
     NULL equ 0
     EXIT_SUCCESS equ 0
     SYS_exit equ 60
-    intNum dd 123    ;32-bit
+    intNum dq -646741975   ;32-bit
 
 section .bss
-    strNum resb 12         ; Reserve 12 bytes (including sign and NULL)
+    strNum resq 1         ; Reserve 12 bytes (including sign and NULL)
 
 section .text
 global _start
 
 _start:
 ; Check for sign and prepare for conversion
-    mov eax, dword [intNum]      ; Load the integer
+    mov rax, qword [intNum]      ; Load the integer
     cdq                          ; Convert DWORD in eax to QWORD in edx:eax (sign-extend for idiv)
     mov ebx, 10                  ; Set divisor for dividing by 10
     cmp eax, 0                   ; Check if the number is negative
