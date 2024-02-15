@@ -1,10 +1,12 @@
 section .data
+; Constants initialization
    NULL equ 0
    EXIT_SUCCESS equ 0
    SYS_exit equ 60
 
+ ; Variables initialization
    isNegative db 0
-   num1 dq 0      ; Variables initialization
+   num1 dq 0      
    num2 dq 0
    result dq 0
    AskUser db "Integer calculator. Choose Operand within (+,-,*,/,^): ", 10,0
@@ -16,7 +18,7 @@ section .data
    pot_user_write db "Enter a number to find it's power of two: ", 10,0
 
 section .bss
-
+; Buffers declaration
    operand resb 1
    strNum1 resq 1
    strNum2 resq 1
@@ -28,13 +30,14 @@ section .text
    
  _start:
 
-mov rax, AskUser               ; Ask the user
-call _print
-
-call _operand_input            ; Get the operation
+mov rax, AskUser                ; Ask the user
+call _print 
+ 
+call _operand_input             ; Get the operation
 
 
 ; Operand input error handeling 
+
 movzx r10 , byte [operand]      ; Move the operand into rax and zero-extend to 64 bits
 
 cmp r10b, '^'                   ; check if the operand is '^', if equall jump to the power of two label
@@ -61,21 +64,19 @@ call _input2                    ; Get second operand
 
 
 
-call _ascii_to_int_one            ;convert strNum1 to integer and initialize it with num1 variable using
-                                  ;'_ascii_to_int' function
+call _ascii_to_int_one          ; convert strNum1 to integer and initialize it with num1 variable using
+                                ; '_ascii_to_int' function
 
 
-call _ascii_to_int_two           ;convert strNum2 to integer and initialize it with num2 variable using
-                                 ;'_ascii_to_int' function
-
-                                 ;make an if else statement to check which operation is needed (+,-,*,/)
+call _ascii_to_int_two           ; convert strNum2 to integer and initialize it with num2 variable using
+                                 ; '_ascii_to_int' function
 
 
-cmp r10b , '+'              ;make an if else statement to check which operation is needed (+,-,*,/)
+cmp r10b , '+'                  ; make an if else statements to check which operation is needed (+,-,*,/)
 je _addition
 
-cmp r10b , '-'                ;calculate the addition '+', subtraction '-', multiplication '*', or division '/'
-je _subtration                ;of num1 and num2 and initialize it with the 'result' variable
+cmp r10b , '-'                  ;calculate the addition '+', subtraction '-', multiplication '*', or division '/'
+je _subtration                  ;of num1 and num2 and initialize it with the 'result' variable
 
 cmp r10b , '*'
 je _multiplication
@@ -97,56 +98,51 @@ call _ascii_to_int_one
 
 
 _power_of_two:
-  mov rax, qword[num1]      ; initialize register rax with the memory value using []
-  imul rax, qword[num1]      ; reults in rdx:rax
+  mov rax, qword[num1]         ; initialize register rax with the memory value using []
+  imul rax, qword[num1]        ; reults in rdx:rax
   mov qword[result] , rax      ; initializing the ans from rax register
 jmp _print_result
 
 
-_addition:                ; simple function to add certain variables
-  mov rax, qword[num1]      ; initialize register rax with the memory value using []
-  add rax, qword[num2]      ; adding num2 to the already existing num1 in the register
+_addition:                     ; simple function to add certain variables
+  mov rax, qword[num1]         ; initialize register rax with the memory value using []
+  add rax, qword[num2]         ; adding num2 to the already existing num1 in the register
   mov qword[result] , rax      ; initializing the ans from rax register
 jmp _print_result
 
 
-_subtration:                ; simple function to add certain variables
-  mov rax, qword[num1]      ; initialize register rax with the memory value using []
-  sub rax, qword[num2]      ; adding num2 to the already existing num1 in the register
+_subtration:                   ; simple function to add certain variables
+  mov rax, qword[num1]         ; initialize register rax with the memory value using []
+  sub rax, qword[num2]         ; adding num2 to the already existing num1 in the register
   mov qword[result] , rax      ; initializing the ans from rax register
 jmp _print_result
 
 
-_multiplication:          ; simple function to multiply certain variables
-  mov rax, qword[num1]      ; initialize register rax with the memory value using []
-  imul rax, qword[num2]      ; reults in rdx:rax
+_multiplication:               ; simple function to multiply certain variables
+  mov rax, qword[num1]         ; initialize register rax with the memory value using []
+  imul rax, qword[num2]        ; reults in rdx:rax
   mov qword[result] , rax      ; initializing the ans from rax register
 jmp _print_result
 
 
-_division:          ; simple function to multiply certain variables
-  mov rax, qword[num1]      ; initialize register rax with the memory value using []
-  cqo ; Sign extend rax into rdx:rax
-  idiv rax, qword[num2]      ; reults in rdx:rax
+_division:                     ; simple function to multiply certain variables
+  mov rax, qword[num1]         ; initialize register rax with the memory value using []
+  cqo                          ; Sign extend rax into rdx:rax
+  idiv rax, qword[num2]        ; reults in rdx:rax
   mov qword[result] , rax      ; initializing the ans from rax register
-jmp _print_result
+jmp _print_result 
 
 
 _print_result:
-mov rax, 0
-mov rax, resultStr
-call _print
-
-
-call _int_to_ascii
-mov rax, strResult
-call _print
-jmp _end
-
-                               ;convert the 'result' variable from integer to ascii using the '_int_to_ascii' function
-                               ;and initialize it with 'strResult'
-
-                               ;write the 'resultStr' in the console using '_print' function
+   mov rax, 0                  
+   mov rax, resultStr           ; Print 'resultStr' variable
+   call _print
+   
+   
+   call _int_to_ascii          ; convert the 'result' variable from integer to ascii using the '_int_to_ascii' function
+   mov rax, strResult          ; and initialize it with 'strResult'
+   call _print
+   jmp _end                    ; jump to the end of the program                           
 
 
 _invalid_operand:
@@ -248,11 +244,11 @@ ret
 ;--------------------------------------ascii to 1st integer----------------------------------------------------
 
 _ascii_to_int_one:
-    mov rsi, 0
-    mov rsi, strNum1      ; Address of the string to rsi
-    mov r8, 0              ; Clear rdi for the result
-    xor eax, eax            ; Clear eax for general use
-    mov al, [rsi]           ; Load the first character of the string
+    mov rsi, 0               ; Clear rsi
+    mov rsi, strNum1         ; Address of the string to rsi
+    mov r8, 0                ; Clear r8 for the result
+    xor eax, eax             ; Clear eax for general use
+    mov al, [rsi]            ; Load the first character of the string
 
     ; Check for valid sign or digit
     cmp al, '-'
@@ -269,8 +265,8 @@ checkNextChar:
 
 validateLoop:
     mov al, [rsi]            ; Load the next character
-    test al, al              ; Check if NULL
-    jz startConversion       ; If NULL, end of string and valid
+    cmp al, 0              ; Check if NULL
+    je startConversion       ; If NULL, end of string and valid
     cmp al, '0'
     jl invalidInput          ; Less than '0' is invalid
     cmp al, '9'
@@ -300,20 +296,20 @@ convertLoop:
     mov rax, 0                  ; Clear RAX
     mov al, [rsi]
     inc rsi
-    test al, al                 ; check if null
-    jz conversionDone
-    sub al, '0'
-    imul r8, r8, 10
-    add r8, rax
+    cmp al, 0                 ; check if null
+    je conversionDone
+    sub al, '0'                 ; subtract the ascii letters with '0' that resembles 48 in decimal to find the correct integer value
+    imul r8, r8, 10             ; multipy the value inside r8 with 10 to get the correct indexing
+    add r8, rax                 ; add what is inside rax to r8
     jmp convertLoop
 
 conversionDone:
-    mov [num1], r8           ; Store the result
+    mov [num1], r8              ; Store the result
     cmp byte [isNegative], 1
-    jne _end1                 ; Jump if not negative
+    jne _end1                   ; Jump if not negative
 
-    neg qword [num1]          ; Negate the result if negative
-    jmp _end1
+    neg qword [num1]            ; Negate the result if negative
+    jmp _end1   
 
 invalidInput:
 mov qword [num1], 0xFFFFFFFF ; Indicate invalid input
@@ -326,10 +322,10 @@ ret
 ;--------------------------------------ascii to 2st integer------------------------------------------------------
 
 _ascii_to_int_two:
-    mov rsi, 0
-    mov rsi, strNum2      ; Address of the string to rsi
+    mov rsi, 0              ; Clear rsi
+    mov rsi, strNum2        ; Address of the string to rsi
     mov rdi, 0              ; Clear rdi for the result
-    mov eax, 0       ; Clear eax for general use
+    mov eax, 0              ; Clear eax for general use
     mov al, [rsi]           ; Load the first character of the string
 
     ; Check for valid sign or digit
@@ -343,64 +339,64 @@ _ascii_to_int_two:
     jg invalidInput2
 
 checkNextChar2:
-    inc rsi                  ; Move to the next character for validation
-
-validateLoop2:
-    mov al, [rsi]            ; Load the next character
-    test al, al              ; Check if NULL
-    jz startConversion2       ; If NULL, end of string and valid
-    cmp al, '0'
-    jl invalidInput2          ; Less than '0' is invalid
-    cmp al, '9'
-    jg invalidInput2          ; Greater than '9' is invalid
-    inc rsi                  ; Move to the next character
-    jmp validateLoop2
-
-startConversion2:
-    mov rsi, strNum2       ; Reset RSI to start of the string for conversion
-    mov al, [rsi]            ; Re-check for a sign
+    inc rsi                         ; Move to the next character for validation
+   
+validateLoop2:   
+    mov al, [rsi]                   ; Load the next character
+    cmp al, 0                     ; Check if NULL
+    je startConversion2             ; If NULL, end of string and valid
+    cmp al, '0'   
+    jl invalidInput2                ; Less than '0' is invalid
+    cmp al, '9'   
+    jg invalidInput2                ; Greater than '9' is invalid
+    inc rsi                         ; Move to the next character
+    jmp validateLoop2   
+   
+startConversion2:   
+    mov rsi, strNum2                ; Reset RSI to start of the string for conversion
+    mov al, [rsi]                   ; Re-check for a sign
     cmp al, '-'
     je negativeNumber2
     cmp al, '+'
     je positiveNumber2
-    jmp convertLoop2          ; If no sign, start conversion
+    jmp convertLoop2                ; If no sign, start conversion
 
 negativeNumber2:
-    mov byte [isNegative], 1     ; Mark as negative
-    inc rsi                      ; Skip the sign for conversion
+    mov byte [isNegative], 1        ; Mark as negative
+    inc rsi                         ; Skip the sign for conversion
     jmp convertLoop2
 
 positiveNumber2:
-    mov byte [isNegative], 0    ; Mark as positive
-    inc rsi                     ; Skip the sign for conversion
+    mov byte [isNegative], 0        ; Mark as positive
+    inc rsi                         ; Skip the sign for conversion
 
 convertLoop2:
-    mov rax, 0                  ; Clear RAX
+    mov rax, 0                      ; Clear RAX
     mov al, [rsi]
-    inc rsi
-    test al, al
-    jz conversionDone2
-    sub al, '0'
-    imul rdi, rdi, 10
-    add rdi, rax
-    jmp convertLoop2
+    inc rsi                       
+    cmp al, 0                     ; chek if 'al' is null
+    je conversionDone2
+    sub al, '0'                     ; subtract the ascii letters with '0' that resembles 48 in decimal to find the correct integer value
+    imul rdi, rdi, 10               ; multipy the value inside r8 with 10 to get the correct indexing
+    add rdi, rax                    ; add what is inside rax to r8
+    jmp convertLoop2     
 
 conversionDone2:
-    mov qword[num2], rdi       ; Store the result
+    mov qword[num2], rdi            ; Store the result
     cmp byte [isNegative], 1
-    jne _end2            ; Jump if not negative
-
-    neg qword [num2]      ; Negate the result if negative
+    jne _end2                       ; Jump if not negative
+ 
+    neg qword [num2]                ; Negate the result if negative
     jmp _end2
 
 invalidInput2:
-mov qword [num2], 0xFFFFFFFF ; Indicate invalid input
+    mov qword [num2], 0xFFFFFFFF    ; Indicate invalid input
 
 _end2:
 
 ret
 
-;--------------------------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -409,21 +405,21 @@ ret
 
 
 _print:
-   push rax        ; push rax to the stack
-   mov rbx, 0      ; rbx used to count the length of the string
-
-_printLoop:
-   inc rax
-   inc rbx
-   mov cl, byte [rax]    ; Moving the rax register to the 8-bit register of the rcx to hold each character
-   cmp cl, 0        ; check if cl is 0
-   jne _printLoop   ; If not print jump to the fucntion again and push the next char to thr stack
-
-   mov rax, 1
-   mov rdi, 1
-   pop rsi          ; pop the value from the rax pushed bytes
-   mov rdx, rbx     ; move the value of rbx to rdx to get the count of the string
+   push rax                ; push rax to the stack
+   mov rbx, 0              ; rbx used to count the length of the string
+  
+_printLoop:  
+   inc rax  
+   inc rbx  
+   mov cl, byte [rax]      ; Moving the rax register to the 8-bit register of the rcx to hold each character
+   cmp cl, 0               ; check if cl is 0
+   jne _printLoop          ; If not print jump to the fucntion again and push the next char to thr stack
+  
+   mov rax, 1  
+   mov rdi, 1  
+   pop rsi                 ; pop the value from the rax pushed bytes
+   mov rdx, rbx            ; move the value of rbx to rdx to get the count of the string
 
    syscall
  ret
-   ;-----------------------------------------------------------------------------
+   ;------------------------------------------------------------------------------------------------------------------

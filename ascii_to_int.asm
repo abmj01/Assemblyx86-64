@@ -1,5 +1,5 @@
 section .data
-    strNumber dq '12345', 0 ; Example of a valid string
+    strNumber dq '999999', 0 ; Example of a valid string
     isNegative db 0
     intResult dq 0
 
@@ -34,8 +34,8 @@ checkNextChar:
 
 validateLoop:
     mov al, [rsi]            ; Load the next character
-    test al, al              ; Check if NULL
-    jz startConversion       ; If NULL, end of string and valid
+    cmp al, 0              ; Check if NULL
+    je startConversion       ; If NULL, end of string and valid
     cmp al, '0'
     jl invalidInput          ; Less than '0' is invalid
     cmp al, '9'
@@ -66,7 +66,7 @@ convertLoop:
     mov al, [rsi]
     inc rsi
     cmp al, 0
-    jz conversionDone
+    je conversionDone
     sub al, '0'
     imul r8, r8, 10
     add r8, rax
