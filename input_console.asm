@@ -4,7 +4,7 @@ section .data
         int1 db 0
 
 section .bss
-    name resb 16
+    name resq 1
 
 section .text    
 global _start

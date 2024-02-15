@@ -13,6 +13,8 @@ global _start
 
 _start:
 ; Check for sign and prepare for conversion
+    mov rbx, 0
+    mov rcx, 0
     mov rax, qword [intNum]      ; Load the integer
     cdq                          ; Convert DWORD in eax to QWORD in edx:eax (sign-extend for idiv)
     mov ebx, 10                  ; Set divisor for dividing by 10

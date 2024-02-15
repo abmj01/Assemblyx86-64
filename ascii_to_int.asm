@@ -1,15 +1,20 @@
 section .data
-    strNumber dd '-99765', 0 ; Example of a valid string
+    strNumber dq '12345', 0 ; Example of a valid string
     isNegative db 0
+    intResult dq 0
 
 section .bss
-    intResult resq 1  ; Reserve space for the result integer
+  ;  intResult resq 1  ; Reserve space for the result integer
+  str1 resq 1
 
 section .text
     global _start
 
 _start:
-    mov rsi, strNumber      ; Address of the string to rsi
+    mov r12, [strNumber]
+    mov [str1], r12
+
+    mov rsi, str1      ; Address of the string to rsi
     mov r8, 0              ; Clear r8 for the result
     xor eax, eax            ; Clear eax for general use
     mov al, [rsi]           ; Load the first character of the string
@@ -60,7 +65,7 @@ convertLoop:
     mov rax, 0                  ; Clear RAX
     mov al, [rsi]
     inc rsi
-    test al, al
+    cmp al, 0
     jz conversionDone
     sub al, '0'
     imul r8, r8, 10
@@ -72,7 +77,7 @@ conversionDone:
     cmp byte [isNegative], 1
     jne exitProgram
              ; Jump if not negative
-    neg dword [intResult]      ; Negate the result if negative
+    neg qword [intResult]      ; Negate the result if negative
 
 exitProgram:
     ; Cleanly exit the program
@@ -81,5 +86,5 @@ exitProgram:
     syscall
 
 invalidInput:
-    mov dword [intResult], 0xFFFFFFFF ; Indicate invalid input
+    mov qword [intResult], 0xFFFFFFFF ; Indicate invalid input
     jmp exitProgram

@@ -10,7 +10,7 @@ EXIT_SUCCESS equ 0 ; successful operation
 SYS_exit equ 60 ; code for terminate
 ; -----
 ; Define Data.
-intNum dd 7549149
+intNum dd -977549
 
 
 
@@ -85,3 +85,39 @@ _printLoop:
    syscall
    ret
    ;-----------------------------------------------------------------------------
+
+   _int_to_ascii:
+       mov rbx, 0
+       mov rcx, 0
+       mov rax, qword [num1]      ; Load the integer
+       cdq                          ; Convert DWORD in eax to QWORD in edx:eax (sign-extend for idiv)
+       mov ebx, 10                  ; Set divisor for dividing by 10
+       cmp eax, 0                   ; Check if the number is negative
+       jge divideLoop               ; If not negative, start dividing the integer
+       neg eax                      ; Negate the number to make it positive for conversion
+       mov byte [strResult], '-'    ; Store '-' sign for negative numbers
+       jmp divideLoop               ; Jump to division loop
+
+   divideLoop:
+       mov edx, 0             ; Clear edx for idiv operation
+       idiv ebx               ; Signed divide edx:eax by ebx
+       push rdx               ; Push remainder
+       inc rcx                ; Increment digit count
+       cmp eax, 0             ; check if eax == 0
+       jne divideLoop         ; Continue loop if eax != 0
+
+       mov rbx, strResult     ; Address of string
+       add rbx, 1             ; Skip the sign character
+       mov rdi, 0             ; idx = 0
+
+    popLoop:
+       pop rax                ; Pop intDigit
+       add al, "0"           ; Convert to ASCII
+       mov [rbx+rdi], al      ; Store char in string
+
+       inc rdi                ; Increment idx
+
+       loop popLoop           ; Continue loop until digitCount == 0
+       mov byte [rbx+rdi], 10 ; Add a new line after number
+
+   ret
