@@ -84,7 +84,7 @@ je _multiplication
 cmp r10b , '/'
 je _division
  
-_pot_exception:                           ;power of two exception
+_pot_exception:                          ;power of two exception
 
 mov rax, pot_user_write
 call _print
@@ -166,11 +166,11 @@ _operand_input:
    mov rdx, 10
    syscall
 
-   mov rbx, rax          ; copy the number of bytes read to rbx for manipulation
-   dec rbx          ; decrement rbx to get the index of the last character read
-   
-   mov byte [rsi + rbx], 0 ; replace the newline character with a null terminator
-ret
+   mov rbx, rax               ; copy the number of bytes read to rbx for manipulation
+   dec rbx                    ; decrement rbx to get the index of the last character read
+      
+   mov byte [rsi + rbx], 0    ; replace the newline character with a null terminator
+ret  
 
 ; First input from the user 'strNum1' buffer function
 _input1:
@@ -180,10 +180,10 @@ _input1:
    mov rdx, 12
    syscall
 
-   mov rbx, rax          ; copy the number of bytes read to rbx for manipulation
-   dec rbx          ; decrement rbx to get the index of the last character read
-   
-   mov byte [rsi + rbx], 0 ; replace the newline character with a null terminator
+   mov rbx, rax                ; copy the number of bytes read to rbx for manipulation
+   dec rbx                     ; decrement rbx to get the index of the last character read
+    
+   mov byte [rsi + rbx], 0     ; replace the newline character with a null terminator
 ret
 
 ; Second input from the user 'strNum1' buffer function
@@ -194,11 +194,11 @@ _input2:
    mov rdx, 10
    syscall
 
-   mov rbx, rax          ; copy the number of bytes read to rbx for manipulation
-   dec rbx          ; decrement rbx to get the index of the last character read
-   
-   mov byte [rsi + rbx], 0 ; replace the newline character with a null terminator
- ret
+   mov rbx, rax               ; copy the number of bytes read to rbx for manipulation
+   dec rbx                    ; decrement rbx to get the index of the last character read
+    
+   mov byte [rsi + rbx], 0    ; replace the newline character with a null terminator
+ ret 
 
 ;--------------------------------------------integer to ascii function------------------------------------------------------
 
@@ -215,26 +215,26 @@ _int_to_ascii:
     jmp divideLoop               ; Jump to division loop
 
 divideLoop:
-    mov edx, 0             ; Clear edx for idiv operation
-    idiv ebx               ; Signed divide edx:eax by ebx
-    push rdx               ; Push remainder
-    inc rcx                ; Increment digit count
-    cmp eax, 0             ; check if eax == 0
-    jne divideLoop         ; Continue loop if eax != 0
-
-    mov rbx, strResult     ; Address of string
-    add rbx, 1             ; Skip the sign character
-    mov rdi, 0             ; idx = 0
-
- popLoop:
-    pop rax                ; Pop intDigit
-    add al, "0"           ; Convert to ASCII
-    mov [rbx+rdi], al      ; Store char in string
-
-    inc rdi                ; Increment idx
-
-    loop popLoop           ; Continue loop until digitCount == 0
-    mov byte [rbx+rdi], 10 ; Add a new line after number
+    mov edx, 0                   ; Clear edx for idiv operation
+    idiv ebx                     ; Signed divide edx:eax by ebx
+    push rdx                     ; Push remainder
+    inc rcx                      ; Increment digit count
+    cmp eax, 0                   ; check if eax == 0
+    jne divideLoop               ; Continue loop if eax != 0
+         
+    mov rbx, strResult           ; Address of string
+    add rbx, 1                   ; Skip the sign character
+    mov rdi, 0                   ; idx = 0
+         
+ popLoop:        
+    pop rax                      ; Pop intDigit
+    add al, "0"                  ; Convert to ASCII
+    mov [rbx+rdi], al            ; Store char in string
+         
+    inc rdi                      ; Increment idx
+         
+    loop popLoop                 ; Continue loop until digitCount == 0
+    mov byte [rbx+rdi], 10       ; Add a new line after number
 
 ret
 ;------------------------------------------------------------------------------------------------------------
@@ -261,27 +261,27 @@ _ascii_to_int_one:
     jg invalidInput
 
 checkNextChar:
-    inc rsi                  ; Move to the next character for validation
+    inc rsi                     ; Move to the next character for validation
 
 validateLoop:
-    mov al, [rsi]            ; Load the next character
-    cmp al, 0              ; Check if NULL
-    je startConversion       ; If NULL, end of string and valid
+    mov al, [rsi]               ; Load the next character
+    cmp al, 0                   ; Check if NULL
+    je startConversion          ; If NULL, end of string and valid
     cmp al, '0'
-    jl invalidInput          ; Less than '0' is invalid
+    jl invalidInput             ; Less than '0' is invalid
     cmp al, '9'
-    jg invalidInput          ; Greater than '9' is invalid
-    inc rsi                  ; Move to the next character
+    jg invalidInput             ; Greater than '9' is invalid
+    inc rsi                     ; Move to the next character
     jmp validateLoop
 
 startConversion:
-    mov rsi, strNum1         ; Reset RSI to start of the string for conversion
-    mov al, [rsi]            ; Re-check for a sign
+    mov rsi, strNum1            ; Reset RSI to start of the string for conversion
+    mov al, [rsi]               ; Re-check for a sign
     cmp al, '-'
     je negativeNumber
     cmp al, '+'
     je positiveNumber
-    jmp convertLoop          ; If no sign, start conversion
+    jmp convertLoop             ; If no sign, start conversion
 
 negativeNumber:
     mov byte [isNegative], 1     ; Mark as negative
@@ -296,7 +296,7 @@ convertLoop:
     mov rax, 0                  ; Clear RAX
     mov al, [rsi]
     inc rsi
-    cmp al, 0                 ; check if null
+    cmp al, 0                   ; check if null
     je conversionDone
     sub al, '0'                 ; subtract the ascii letters with '0' that resembles 48 in decimal to find the correct integer value
     imul r8, r8, 10             ; multipy the value inside r8 with 10 to get the correct indexing
@@ -322,11 +322,11 @@ ret
 ;--------------------------------------ascii to 2st integer------------------------------------------------------
 
 _ascii_to_int_two:
-    mov rsi, 0              ; Clear rsi
-    mov rsi, strNum2        ; Address of the string to rsi
-    mov rdi, 0              ; Clear rdi for the result
-    mov eax, 0              ; Clear eax for general use
-    mov al, [rsi]           ; Load the first character of the string
+    mov rsi, 0                      ; Clear rsi
+    mov rsi, strNum2                ; Address of the string to rsi
+    mov rdi, 0                      ; Clear rdi for the result
+    mov eax, 0                      ; Clear eax for general use
+    mov al, [rsi]                   ; Load the first character of the string
 
     ; Check for valid sign or digit
     cmp al, '-'
@@ -343,7 +343,7 @@ checkNextChar2:
    
 validateLoop2:   
     mov al, [rsi]                   ; Load the next character
-    cmp al, 0                     ; Check if NULL
+    cmp al, 0                       ; Check if NULL
     je startConversion2             ; If NULL, end of string and valid
     cmp al, '0'   
     jl invalidInput2                ; Less than '0' is invalid
@@ -374,7 +374,7 @@ convertLoop2:
     mov rax, 0                      ; Clear RAX
     mov al, [rsi]
     inc rsi                       
-    cmp al, 0                     ; chek if 'al' is null
+    cmp al, 0                       ; chek if 'al' is null
     je conversionDone2
     sub al, '0'                     ; subtract the ascii letters with '0' that resembles 48 in decimal to find the correct integer value
     imul rdi, rdi, 10               ; multipy the value inside r8 with 10 to get the correct indexing
