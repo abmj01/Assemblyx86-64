@@ -20,9 +20,9 @@ section .data
 section .bss
 ; Buffers declaration
    operand resb 1
-   strNum1 resq 1
-   strNum2 resq 1
-   strResult resq 1
+   strNum1 resq 2
+   strNum2 resq 2
+   strResult resq 2
 
 
 section .text
