@@ -1,0 +1,445 @@
+     1                                 %line 1+1 calculator.asm
+     2                                 [section .data]
+     3                                 
+     4                                  NULL equ 0
+     5                                  EXIT_SUCCESS equ 0
+     6                                  SYS_exit equ 60
+     7                                 
+     8                                 
+     9 00000000 00                      isNegative db 0
+    10 00000001 0000000000000000        num1 dq 0
+    11 00000009 0000000000000000        num2 dq 0
+    12 00000011 0000000000000000        result dq 0
+    13 00000019 496E74656765722063-     AskUser db "Integer calculator. Choose Operand within (+,-,*,/,^): ", 10,0
+    14 00000019 616C63756C61746F72-
+    15 00000019 2E2043686F6F736520-
+    16 00000019 4F706572616E642077-
+    17 00000019 697468696E20282B2C-
+    18 00000019 2D2C2A2C2F2C5E293A-
+    19 00000019 200A00             
+    20 00000052 456E74657220666972-     firstOp db "Enter first operand: ", 10,0
+    21 00000052 7374206F706572616E-
+    22 00000052 643A200A00         
+    23 00000069 456E74657220736563-     secondOp db "Enter second operand: ", 10,0
+    24 00000069 6F6E64206F70657261-
+    25 00000069 6E643A200A00       
+    26 00000081 496E76616C6964206F-     invalidOperation db "Invalid opration! ", 10,0
+    27 00000081 70726174696F6E2120-
+    28 00000081 0A00               
+    29 00000095 54686520726573756C-     resultStr db "The result is: ", 10,0
+    30 00000095 742069733A200A00   
+    31 000000A6 776F7721210A00          wow db "wow!!", 10,0
+    32 000000AD 456E7465722061206E-     pot_user_write db "Enter a number to find it's power of two: ", 10,0
+    33 000000AD 756D62657220746F20-
+    34 000000AD 66696E642069742773-
+    35 000000AD 20706F776572206F66-
+    36 000000AD 2074776F3A200A00   
+    37                                 
+    38                                 [section .bss]
+    39                                 
+    40 00000000 <gap>                   operand resb 1
+    41 00000001 <gap>                   strNum1 resq 2
+    42 00000011 <gap>                   strNum2 resq 2
+    43 00000021 <gap>                   strResult resq 2
+    44                                 
+    45                                 
+    46                                 [section .text]
+    47                                 [global _start]
+    48                                 
+    49                                  _start:
+    50                                 
+    51 00000000 48C7C0[00000000]       mov rax, AskUser
+    52 00000007 E882030000             call _print
+    53                                 
+    54 0000000C E844010000             call _operand_input
+    55                                 
+    56                                 
+    57                                 
+    58                                 
+    59 00000011 4C0FB61425[00000000]     movzx r10 , byte [operand]
+    60                                 
+    61 0000001A 4180FA5E               cmp r10b, '^'
+    62 0000001E 745A                   je _pot_exception
+    63                                 
+    64 00000020 4180FA2A               cmp r10b , '*'
+    65 00000024 0F820E010000           jb _invalid_operand
+    66                                 
+    67 0000002A 4180FA2F               cmp r10b , '/'
+    68 0000002E 0F8704010000           ja _invalid_operand
+    69                                 
+    70                                 
+    71 00000034 48C7C0[00000000]       mov rax, firstOp
+    72 0000003B E84E030000             call _print
+    73                                 
+    74                                 
+    75 00000040 E839010000             call _input1
+    76                                 
+    77                                 
+    78 00000045 48C7C0[00000000]       mov rax, secondOp
+    79 0000004C E83D030000             call _print
+    80                                 
+    81 00000051 E851010000             call _input2
+    82                                 
+    83                                 
+    84                                 
+    85 00000056 E8D4010000             call _ascii_to_int_one
+    86                                 
+    87                                 
+    88                                 
+    89 0000005B E87D020000             call _ascii_to_int_two
+    90                                 
+    91                                 
+    92                                 
+    93 00000060 4180FA2B               cmp r10b , '+'
+    94 00000064 7445                   je _addition
+    95                                 
+    96 00000066 4180FA2D               cmp r10b , '-'
+    97 0000006A 7459                   je _subtration
+    98                                 
+    99 0000006C 4180FA2A               cmp r10b , '*'
+   100 00000070 746D                   je _multiplication
+   101                                 
+   102 00000072 4180FA2F               cmp r10b , '/'
+   103 00000076 0F847A000000           je _division
+   104                                 
+   105                                 _pot_exception:
+   106                                 
+   107 0000007C 48C7C0[00000000]       mov rax, pot_user_write
+   108 00000083 E806030000             call _print
+   109                                 
+   110                                 
+   111 00000088 E8F1000000             call _input1
+   112                                 
+   113                                 
+   114 0000008D E89D010000             call _ascii_to_int_one
+   115                                 
+   116                                 
+   117                                 
+   118                                 _power_of_two:
+   119 00000092 488B0425[00000000]      mov rax, qword[num1]
+   120 0000009A 480FAF0425[00000000]      imul rax, qword[num1]
+   121 000000A3 48890425[00000000]      mov qword[result] , rax
+   122 000000AB EB69                   jmp _print_result
+   123                                 
+   124                                 
+   125                                 _addition:
+   126 000000AD 488B0425[00000000]      mov rax, qword[num1]
+   127 000000B5 48030425[00000000]      add rax, qword[num2]
+   128 000000BD 48890425[00000000]      mov qword[result] , rax
+   129 000000C5 EB4F                   jmp _print_result
+   130                                 
+   131                                 
+   132                                 _subtration:
+   133 000000C7 488B0425[00000000]      mov rax, qword[num1]
+   134 000000CF 482B0425[00000000]      sub rax, qword[num2]
+   135 000000D7 48890425[00000000]      mov qword[result] , rax
+   136 000000DF EB35                   jmp _print_result
+   137                                 
+   138                                 
+   139                                 _multiplication:
+   140 000000E1 488B0425[00000000]      mov rax, qword[num1]
+   141 000000E9 480FAF0425[00000000]      imul rax, qword[num2]
+   142 000000F2 48890425[00000000]      mov qword[result] , rax
+   143 000000FA EB1A                   jmp _print_result
+   144                                 
+   145                                 
+   146                                 _division:
+   147 000000FC 488B0425[00000000]      mov rax, qword[num1]
+   148 00000104 4899                    cqo
+   149 00000106 48F73C25[00000000]      idiv rax, qword[num2]
+   150 0000010E 48890425[00000000]      mov qword[result] , rax
+   151 00000116 EBFE                   jmp _print_result
+   152                                 
+   153                                 
+   154                                 _print_result:
+   155 00000118 48C7C000000000          mov rax, 0
+   156 0000011F 48C7C0[00000000]        mov rax, resultStr
+   157 00000126 E863020000              call _print
+   158                                 
+   159                                 
+   160 0000012B E8A0000000              call _int_to_ascii
+   161 00000130 48C7C0[00000000]        mov rax, strResult
+   162 00000137 E852020000              call _print
+   163 0000013C EB0A                    jmp _end
+   164                                 
+   165                                 
+   166                                 _invalid_operand:
+   167 0000013E 48C7C0[00000000]        mov rax, invalidOperation
+   168 00000145 E844020000              call _print
+   169                                 
+   170                                 
+   171                                 _end:
+   172 0000014A 48C7C03C000000          mov rax, SYS_exit
+   173 00000151 48C7C700000000          mov rdi, EXIT_SUCCESS
+   174 00000158 0F05                    syscall
+   175                                 
+   176                                 
+   177                                 
+   178                                 
+   179                                 
+   180                                 _operand_input:
+   181 0000015A 48C7C000000000          mov rax, 0
+   182 00000161 48C7C700000000          mov rdi, 0
+   183 00000168 48C7C6[00000000]        mov rsi, operand
+   184 0000016F 48C7C20A000000          mov rdx, 10
+   185 00000176 0F05                    syscall
+   186                                 
+   187 00000178 4889C3                  mov rbx, rax
+   188 0000017B 48FFCB                  dec rbx
+   189                                 
+   190 0000017E C6041E00                mov byte [rsi + rbx], 0
+   191 00000182 C3                     ret
+   192                                 
+   193                                 
+   194                                 _input1:
+   195 00000183 48C7C000000000          mov rax, 0
+   196 0000018A 48C7C700000000          mov rdi, 0
+   197 00000191 48C7C6[00000000]        mov rsi, strNum1
+   198 00000198 48C7C20C000000          mov rdx, 12
+   199 0000019F 0F05                    syscall
+   200                                 
+   201 000001A1 4889C3                  mov rbx, rax
+   202 000001A4 48FFCB                  dec rbx
+   203                                 
+   204 000001A7 C6041E00                mov byte [rsi + rbx], 0
+   205 000001AB C3                     ret
+   206                                 
+   207                                 
+   208                                 _input2:
+   209 000001AC 48C7C000000000          mov rax, 0
+   210 000001B3 48C7C700000000          mov rdi, 0
+   211 000001BA 48C7C6[00000000]        mov rsi, strNum2
+   212 000001C1 48C7C20A000000          mov rdx, 10
+   213 000001C8 0F05                    syscall
+   214                                 
+   215 000001CA 4889C3                  mov rbx, rax
+   216 000001CD 48FFCB                  dec rbx
+   217                                 
+   218 000001D0 C6041E00                mov byte [rsi + rbx], 0
+   219 000001D4 C3                      ret
+   220                                 
+   221                                 
+   222                                 
+   223                                 _int_to_ascii:
+   224 000001D5 48C7C300000000          mov rbx, 0
+   225 000001DC 48C7C100000000          mov rcx, 0
+   226 000001E3 488B0425[00000000]      mov rax, qword [result]
+   227 000001EB 99                      cdq
+   228 000001EC BB0A000000              mov ebx, 10
+   229 000001F1 83F800                  cmp eax, 0
+   230 000001F4 7D0A                    jge divideLoop
+   231 000001F6 F7D8                    neg eax
+   232 000001F8 C60425[00000000]2D      mov byte [strResult], '-'
+   233 00000200 EBFE                    jmp divideLoop
+   234                                 
+   235                                 divideLoop:
+   236 00000202 BA00000000              mov edx, 0
+   237 00000207 F7FB                    idiv ebx
+   238 00000209 52                      push rdx
+   239 0000020A 48FFC1                  inc rcx
+   240 0000020D 83F800                  cmp eax, 0
+   241 00000210 75EE                    jne divideLoop
+   242                                 
+   243 00000212 48C7C3[00000000]        mov rbx, strResult
+   244 00000219 4883C301                add rbx, 1
+   245 0000021D 48C7C700000000          mov rdi, 0
+   246                                 
+   247                                  popLoop:
+   248 00000224 58                      pop rax
+   249 00000225 0430                    add al, "0"
+   250 00000227 88043B                  mov [rbx+rdi], al
+   251                                 
+   252 0000022A 48FFC7                  inc rdi
+   253                                 
+   254 0000022D E2F3                    loop popLoop
+   255 0000022F C6043B0A                mov byte [rbx+rdi], 10
+   256                                 
+   257 00000233 C3                     ret
+   258                                 
+   259                                 
+   260                                 
+   261                                 
+   262                                 
+   263                                 
+   264                                 _ascii_to_int_one:
+   265 00000234 48C7C600000000          mov rsi, 0
+   266 0000023B 48C7C6[00000000]        mov rsi, strNum1
+   267 00000242 49C7C000000000          mov r8, 0
+   268 00000249 31C0                    xor eax, eax
+   269 0000024B 8A06                    mov al, [rsi]
+   270                                 
+   271                                 
+   272 0000024D 3C2D                    cmp al, '-'
+   273 0000024F 740A                    je checkNextChar
+   274 00000251 3C2B                    cmp al, '+'
+   275 00000253 7406                    je checkNextChar
+   276 00000255 3C30                    cmp al, '0'
+   277 00000257 7C7A                    jl invalidInput
+   278 00000259 3C39                    cmp al, '9'
+   279 0000025B 7F76                    jg invalidInput
+   280                                 
+   281                                 checkNextChar:
+   282 0000025D 48FFC6                  inc rsi
+   283                                 
+   284                                 validateLoop:
+   285 00000260 8A06                    mov al, [rsi]
+   286 00000262 3C00                    cmp al, 0
+   287 00000264 740B                    je startConversion
+   288 00000266 3C30                    cmp al, '0'
+   289 00000268 7C69                    jl invalidInput
+   290 0000026A 3C39                    cmp al, '9'
+   291 0000026C 7F65                    jg invalidInput
+   292 0000026E 48FFC6                  inc rsi
+   293 00000271 EBEB                    jmp validateLoop
+   294                                 
+   295                                 startConversion:
+   296 00000273 48C7C6[00000000]        mov rsi, strNum1
+   297 0000027A 8A06                    mov al, [rsi]
+   298 0000027C 3C2D                    cmp al, '-'
+   299 0000027E 7404                    je negativeNumber
+   300 00000280 3C2B                    cmp al, '+'
+   301 00000282 740D                    je positiveNumber
+   302 00000284 EB16                    jmp convertLoop
+   303                                 
+   304                                 negativeNumber:
+   305 00000286 C60425[00000000]01      mov byte [isNegative], 1
+   306 0000028E 48FFC6                  inc rsi
+   307 00000291 EB09                    jmp convertLoop
+   308                                 
+   309                                 positiveNumber:
+   310 00000293 C60425[00000000]00      mov byte [isNegative], 0
+   311 0000029B 48FFC6                  inc rsi
+   312                                 
+   313                                 convertLoop:
+   314 0000029E 48C7C000000000          mov rax, 0
+   315 000002A5 8A06                    mov al, [rsi]
+   316 000002A7 48FFC6                  inc rsi
+   317 000002AA 3C00                    cmp al, 0
+   318 000002AC 7409                    je conversionDone
+   319 000002AE 2C30                    sub al, '0'
+   320 000002B0 4D6BC00A                imul r8, r8, 10
+   321 000002B4 4901C0                  add r8, rax
+   322 000002B7 EBE3                    jmp convertLoop
+   323                                 
+   324                                 conversionDone:
+   325 000002B9 4C890425[00000000]      mov [num1], r8
+   326 000002C1 803C25[00000000]01      cmp byte [isNegative], 1
+   327 000002C9 7514                    jne _end1
+   328                                 
+   329 000002CB 48F71C25[00000000]      neg qword [num1]
+   330 000002D3 EB0A                    jmp _end1
+   331                                 
+   332                                 invalidInput:
+   333 000002D5 48C70425[00000000]-    mov qword [num1], 0xFFFFFFFF
+   334 000002D5 FFFFFFFF           
+   335                                 
+   336                                 _end1:
+   337 000002E1 C3                     ret
+   338                                 
+   339                                 
+   340                                 
+   341                                 
+   342                                 
+   343                                 _ascii_to_int_two:
+   344 000002E2 48C7C600000000          mov rsi, 0
+   345 000002E9 48C7C6[00000000]        mov rsi, strNum2
+   346 000002F0 48C7C700000000          mov rdi, 0
+   347 000002F7 B800000000              mov eax, 0
+   348 000002FC 8A06                    mov al, [rsi]
+   349                                 
+   350                                 
+   351 000002FE 3C2D                    cmp al, '-'
+   352 00000300 740A                    je checkNextChar2
+   353 00000302 3C2B                    cmp al, '+'
+   354 00000304 7406                    je checkNextChar2
+   355 00000306 3C30                    cmp al, '0'
+   356 00000308 7C7A                    jl invalidInput2
+   357 0000030A 3C39                    cmp al, '9'
+   358 0000030C 7F76                    jg invalidInput2
+   359                                 
+   360                                 checkNextChar2:
+   361 0000030E 48FFC6                  inc rsi
+   362                                 
+   363                                 validateLoop2:
+   364 00000311 8A06                    mov al, [rsi]
+   365 00000313 3C00                    cmp al, 0
+   366 00000315 740B                    je startConversion2
+   367 00000317 3C30                    cmp al, '0'
+   368 00000319 7C69                    jl invalidInput2
+   369 0000031B 3C39                    cmp al, '9'
+   370 0000031D 7F65                    jg invalidInput2
+   371 0000031F 48FFC6                  inc rsi
+   372 00000322 EBEB                    jmp validateLoop2
+   373                                 
+   374                                 startConversion2:
+   375 00000324 48C7C6[00000000]        mov rsi, strNum2
+   376 0000032B 8A06                    mov al, [rsi]
+   377 0000032D 3C2D                    cmp al, '-'
+   378 0000032F 7404                    je negativeNumber2
+   379 00000331 3C2B                    cmp al, '+'
+   380 00000333 740D                    je positiveNumber2
+   381 00000335 EB16                    jmp convertLoop2
+   382                                 
+   383                                 negativeNumber2:
+   384 00000337 C60425[00000000]01      mov byte [isNegative], 1
+   385 0000033F 48FFC6                  inc rsi
+   386 00000342 EB09                    jmp convertLoop2
+   387                                 
+   388                                 positiveNumber2:
+   389 00000344 C60425[00000000]00      mov byte [isNegative], 0
+   390 0000034C 48FFC6                  inc rsi
+   391                                 
+   392                                 convertLoop2:
+   393 0000034F 48C7C000000000          mov rax, 0
+   394 00000356 8A06                    mov al, [rsi]
+   395 00000358 48FFC6                  inc rsi
+   396 0000035B 3C00                    cmp al, 0
+   397 0000035D 7409                    je conversionDone2
+   398 0000035F 2C30                    sub al, '0'
+   399 00000361 486BFF0A                imul rdi, rdi, 10
+   400 00000365 4801C7                  add rdi, rax
+   401 00000368 EBE3                    jmp convertLoop2
+   402                                 
+   403                                 conversionDone2:
+   404 0000036A 48893C25[00000000]      mov qword[num2], rdi
+   405 00000372 803C25[00000000]01      cmp byte [isNegative], 1
+   406 0000037A 7514                    jne _end2
+   407                                 
+   408 0000037C 48F71C25[00000000]      neg qword [num2]
+   409 00000384 EB0A                    jmp _end2
+   410                                 
+   411                                 invalidInput2:
+   412 00000386 48C70425[00000000]-     mov qword [num2], 0xFFFFFFFF
+   413 00000386 FFFFFFFF           
+   414                                 
+   415                                 _end2:
+   416                                 
+   417 00000392 C3                     ret
+   418                                 
+   419                                 
+   420                                 
+   421                                 
+   422                                 
+   423                                 
+   424                                 
+   425                                 
+   426                                 
+   427                                 _print:
+   428 00000393 50                      push rax
+   429 00000394 48C7C300000000          mov rbx, 0
+   430                                 
+   431                                 _printLoop:
+   432 0000039B 48FFC0                  inc rax
+   433 0000039E 48FFC3                  inc rbx
+   434 000003A1 8A08                    mov cl, byte [rax]
+   435 000003A3 80F900                  cmp cl, 0
+   436 000003A6 75F1                    jne _printLoop
+   437                                 
+   438 000003A8 48C7C001000000          mov rax, 1
+   439 000003AF 48C7C701000000          mov rdi, 1
+   440 000003B6 5E                      pop rsi
+   441 000003B7 4889DA                  mov rdx, rbx
+   442                                 
+   443 000003BA 0F05                    syscall
+   444 000003BC C3                      ret
+   445                                 
